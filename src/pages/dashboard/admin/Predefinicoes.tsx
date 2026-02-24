@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Settings, Save, Loader2, Globe, MessageCircle, Shield, DollarSign, Users, RefreshCw } from 'lucide-react';
 import { systemConfigAdminService, SystemConfigItem } from '@/services/systemConfigAdminService';
+import DashboardPageWrapper from '@/components/dashboard/layout/DashboardPageWrapper';
+import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
   general: { label: 'Geral', icon: <Globe className="h-4 w-4" /> },
@@ -50,7 +52,6 @@ const Predefinicoes = () => {
     try {
       await systemConfigAdminService.updateConfig(key, editedValues[key], type);
       toast.success(`Configuração "${key}" atualizada com sucesso!`);
-      // Atualizar o valor original no state
       setConfigs((prev) =>
         prev.map((c) =>
           c.config_key === key ? { ...c, config_value: editedValues[key] } : c
@@ -111,13 +112,13 @@ const Predefinicoes = () => {
       return (
         <div
           key={config.config_key}
-          className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors"
         >
-          <div className="flex-1">
-            <Label className="text-sm font-semibold">{config.description || config.config_key}</Label>
-            <p className="text-xs text-muted-foreground mt-0.5 font-mono">{config.config_key}</p>
+          <div className="flex-1 min-w-0">
+            <Label className="text-sm font-semibold break-words">{config.description || config.config_key}</Label>
+            <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">{config.config_key}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-end sm:self-auto">
             <Switch
               checked={value === 'true' || value === '1'}
               onCheckedChange={(checked) => {
@@ -148,16 +149,17 @@ const Predefinicoes = () => {
     return (
       <div
         key={config.config_key}
-        className="p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors space-y-2"
+        className="p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors space-y-2"
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-sm font-semibold">{config.description || config.config_key}</Label>
-            <p className="text-xs text-muted-foreground font-mono">{config.config_key}</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <Label className="text-sm font-semibold break-words">{config.description || config.config_key}</Label>
+            <p className="text-xs text-muted-foreground font-mono truncate">{config.config_key}</p>
           </div>
           {changed && (
             <Button
               size="sm"
+              className="self-end sm:self-auto shrink-0"
               onClick={() => handleSave(config.config_key, config.config_type)}
               disabled={saving === config.config_key}
             >
@@ -187,50 +189,53 @@ const Predefinicoes = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <DashboardPageWrapper>
+        <DashboardTitleCard
+          title="Predefinições"
+          subtitle="Configurações globais do sistema"
+          icon={<Settings className="h-5 w-5" />}
+          backTo="/dashboard"
+        />
+        <div className="flex items-center justify-center min-h-[300px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardPageWrapper>
     );
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Settings className="h-6 w-6 text-primary" />
-            Predefinições do Sistema
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Gerencie todas as configurações da plataforma em um só lugar.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={fetchConfigs}>
-            <RefreshCw className="h-4 w-4 mr-1" />
-            Recarregar
-          </Button>
-          <Button size="sm" onClick={handleSaveAll} disabled={saving === 'all'}>
-            {saving === 'all' ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-1" />
-            ) : (
-              <Save className="h-4 w-4 mr-1" />
-            )}
-            Salvar Tudo
-          </Button>
-        </div>
-      </div>
+    <DashboardPageWrapper>
+      <DashboardTitleCard
+        title="Predefinições"
+        subtitle="Gerencie todas as configurações da plataforma"
+        icon={<Settings className="h-5 w-5" />}
+        backTo="/dashboard"
+        right={
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={fetchConfigs}>
+              <RefreshCw className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Recarregar</span>
+            </Button>
+            <Button size="sm" onClick={handleSaveAll} disabled={saving === 'all'}>
+              {saving === 'all' ? (
+                <Loader2 className="h-4 w-4 animate-spin sm:mr-1" />
+              ) : (
+                <Save className="h-4 w-4 sm:mr-1" />
+              )}
+              <span className="hidden sm:inline">Salvar Tudo</span>
+            </Button>
+          </div>
+        }
+      />
 
-      {/* Tabs por categoria */}
       <Tabs defaultValue={categories[0] || 'general'} className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1">
+        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1 w-full">
           {categories.map((cat) => {
             const info = CATEGORY_LABELS[cat] || { label: cat, icon: <Settings className="h-4 w-4" /> };
             return (
               <TabsTrigger key={cat} value={cat} className="flex items-center gap-1.5 text-xs sm:text-sm">
                 {info.icon}
-                {info.label}
+                <span className="hidden xs:inline">{info.label}</span>
               </TabsTrigger>
             );
           })}
@@ -241,13 +246,13 @@ const Predefinicoes = () => {
           return (
             <TabsContent key={cat} value={cat} className="mt-4">
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
+                <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                     {info.icon}
                     {info.label}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="p-3 sm:p-6 pt-0 space-y-3">
                   {groupedConfigs[cat].map(renderConfigField)}
                 </CardContent>
               </Card>
@@ -255,7 +260,7 @@ const Predefinicoes = () => {
           );
         })}
       </Tabs>
-    </div>
+    </DashboardPageWrapper>
   );
 };
 
