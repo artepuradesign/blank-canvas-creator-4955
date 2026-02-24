@@ -267,6 +267,15 @@ try {
     } elseif (strpos($uri, '/pix-payments') === 0) {
         error_log("ROUTING: Direcionando para PIX Payments");
         require_once __DIR__ . '/../pix-payments.php';
+    } elseif (strpos($uri, '/system-config') === 0) {
+        error_log("ROUTING: Direcionando para system-config");
+        if ($uri === '/system-config/get' && $method === 'GET') {
+            require_once __DIR__ . '/../src/endpoints/system-config/get.php';
+        } elseif ($uri === '/system-config/update' && ($method === 'POST' || $method === 'PUT')) {
+            require_once __DIR__ . '/../src/endpoints/system-config/update.php';
+        } else {
+            Response::error('Endpoint system-config não encontrado', 404);
+        }
     } elseif ($uri === '/update-expiry' || $uri === '/update_expiry') {
         error_log("ROUTING: Direcionando para Update Expiry (Reativar QR Code)");
         require_once __DIR__ . '/../update_expiry.php';
