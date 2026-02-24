@@ -1,32 +1,27 @@
 <?php
 // src/endpoints/system-config/update.php
+// Reutiliza $db do roteador (public/index.php ou index.php)
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, PUT, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
-
-require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../utils/Response.php';
 require_once __DIR__ . '/../../services/SystemConfigService.php';
 
 try {
-    $db = getDBConnection();
+    // Reaproveitar conexão do roteador pai, ou criar nova se necessário
+    if (!isset($db) || !$db) {
+        require_once __DIR__ . '/../../../config/conexao.php';
+        $db = getDBConnection();
+    }
     
     if (!$db) {
         Response::error('Erro de conexão com o banco de dados', 500);
         exit;
     }
     
-    // Verify admin authorization (you can implement your auth logic here)
+    // Verify admin authorization
     $headers = getallheaders();
-    $authHeader = $headers['Authorization'] ?? '';
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
     
-    if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+    if (!$authHeader || strpos($authHeader, 'Bearer ') !== 0) {
         Response::error('Token de autorização necessário', 401);
         exit;
     }
@@ -63,7 +58,6 @@ try {
     );
     
     if ($success) {
-        // Clear cache
         $systemConfigService->clearCache($input['config_key']);
         
         Response::success([
@@ -76,5 +70,5 @@ try {
     
 } catch (Exception $e) {
     error_log("SYSTEM_CONFIG_UPDATE ERROR: " . $e->getMessage());
-    Response::error('Erro interno do servidor', 500);
+    Response::error('Erro interno do servidor: ' . $e->getMessage(), 500);
 }
