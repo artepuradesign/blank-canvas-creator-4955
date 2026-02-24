@@ -140,11 +140,22 @@ try {
         exit();
     }
     
-    // Configuração específica - endpoint direto
-    if ($endpoint === '/system-config-get' || $endpoint === '/system-config-get.php') {
-        if ($method === 'GET') {
-            include __DIR__ . '/system-config-get.php';
+    // Configuração do sistema - GET e UPDATE
+    if (strpos($endpoint, '/system-config') === 0) {
+        if ($endpoint === '/system-config/get' && $method === 'GET') {
+            include __DIR__ . '/src/endpoints/system-config/get.php';
             exit();
+        }
+        if ($endpoint === '/system-config/update' && ($method === 'POST' || $method === 'PUT')) {
+            include __DIR__ . '/src/endpoints/system-config/update.php';
+            exit();
+        }
+        // Fallback antigo
+        if ($endpoint === '/system-config-get' || $endpoint === '/system-config-get.php') {
+            if ($method === 'GET') {
+                include __DIR__ . '/system-config-get.php';
+                exit();
+            }
         }
     }
     

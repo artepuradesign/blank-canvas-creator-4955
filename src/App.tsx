@@ -138,7 +138,7 @@ import ModuloOff from '@/pages/ModuleStatus/ModuloOff';
 import ModulePage from '@/components/module/ModulePage';
 import Sessions from '@/pages/dashboard/Sessions';
 import SessionNotification from '@/components/notifications/SessionNotification';
-
+import Predefinicoes from '@/pages/dashboard/admin/Predefinicoes';
 
 // Novos painéis específicos
 import PainelColeta from '@/pages/dashboard/PainelColeta';
@@ -305,6 +305,7 @@ function App() {
                     <Route path="/dashboard/admin/paineis-ativos" element={<DashboardLayout><AdminPaineisAtivos /></DashboardLayout>} />
                     <Route path="/dashboard/admin/modulos" element={<DashboardLayout><AdminModulos /></DashboardLayout>} />
                     <Route path="/dashboard/admin/usuarios-online" element={<DashboardLayout><AdminUsuariosOnline /></DashboardLayout>} />
+                    <Route path="/dashboard/admin/predefinicoes" element={<DashboardLayout><RequireSupportOrAdmin><Predefinicoes /></RequireSupportOrAdmin></DashboardLayout>} />
                     
                     
                     {/* Integrações */}

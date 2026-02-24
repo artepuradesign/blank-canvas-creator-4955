@@ -41,7 +41,7 @@ try {
     $stmt->execute([$token]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if (!$user || $user['user_role'] !== 'admin') {
+    if (!$user || !in_array($user['user_role'], ['admin', 'suporte'])) {
         Response::error('Acesso negado - apenas administradores', 403);
         exit;
     }
