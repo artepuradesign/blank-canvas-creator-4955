@@ -269,9 +269,10 @@ try {
         require_once __DIR__ . '/../pix-payments.php';
     } elseif (strpos($uri, '/system-config') === 0) {
         error_log("ROUTING: Direcionando para system-config");
-        if ($uri === '/system-config/get' && $method === 'GET') {
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        if (strpos($uri, '/system-config/get') === 0 && $requestMethod === 'GET') {
             require_once __DIR__ . '/../src/endpoints/system-config/get.php';
-        } elseif ($uri === '/system-config/update' && ($method === 'POST' || $method === 'PUT')) {
+        } elseif ($uri === '/system-config/update' && ($requestMethod === 'POST' || $requestMethod === 'PUT')) {
             require_once __DIR__ . '/../src/endpoints/system-config/update.php';
         } else {
             Response::error('Endpoint system-config não encontrado', 404);

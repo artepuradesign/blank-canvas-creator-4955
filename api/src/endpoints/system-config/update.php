@@ -29,9 +29,9 @@ try {
     $token = substr($authHeader, 7);
     
     // Verify admin token/session
-    $query = "SELECT u.user_id, u.user_role FROM user_sessions us 
-              JOIN users u ON us.user_id = u.user_id 
-              WHERE us.session_token = ? AND us.expires_at > NOW() AND us.status = 'active'";
+    $query = "SELECT u.id, u.user_role FROM user_sessions us 
+              JOIN users u ON us.user_id = u.id 
+              WHERE us.session_token = ? AND us.expires_at > NOW() AND us.status = 'ativa'";
     $stmt = $db->prepare($query);
     $stmt->execute([$token]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
