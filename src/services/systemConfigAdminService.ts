@@ -1,5 +1,4 @@
 import { getApiUrl } from '@/config/api';
-import { getAuthHeaders } from '@/config/apiConfig';
 
 export interface SystemConfigItem {
   config_key: string;
@@ -10,12 +9,33 @@ export interface SystemConfigItem {
   is_public: boolean;
 }
 
+const getToken = (): string | null => {
+  try {
+    const cookies = document.cookie.split(';');
+    const sessionCookie = cookies.find(c => c.trim().startsWith('session_token='));
+    const apiSessionCookie = cookies.find(c => c.trim().startsWith('api_session_token='));
+    if (sessionCookie) return sessionCookie.split('=')[1];
+    if (apiSessionCookie) return apiSessionCookie.split('=')[1];
+  } catch {}
+  return null;
+};
+
+const getHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+  const token = getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+};
+
 export const systemConfigAdminService = {
   async getAllConfigs(category?: string): Promise<SystemConfigItem[]> {
     const url = getApiUrl(`/system-config/get${category ? `?category=${category}` : ''}`);
     const response = await fetch(url, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: getHeaders(),
     });
     const data = await response.json();
     if (data.success) {
@@ -31,7 +51,7 @@ export const systemConfigAdminService = {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: getHeaders(),
       body: JSON.stringify(body),
     });
     const data = await response.json();
